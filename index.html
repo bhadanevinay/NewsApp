@@ -90,11 +90,16 @@
             document.querySelector(`button[onclick="fetchNews('${category}')"]`).classList.add("active");
 
             try {
-                const response = await fetch(`https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=${API_KEY}`);
+                const apiUrl = `https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=${API_KEY}`;
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`;
+
+                const response = await fetch(proxyUrl);
                 const data = await response.json();
+                const articles = JSON.parse(data.contents).articles;
+                
                 newsContainer.innerHTML = "";
                 
-                data.articles.forEach(article => {
+                articles.forEach(article => {
                     const newsCard = `
                         <div class="news-card">
                             <img src="${article.urlToImage || 'https://via.placeholder.com/150'}" alt="News Image">
@@ -107,6 +112,7 @@
                 });
             } catch (error) {
                 console.error("Error fetching news:", error);
+                newsContainer.innerHTML = "<p style='color:red; text-align:center;'>Failed to load news. Try again later.</p>";
             }
         }
 
