@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #dd2323;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 24px;
+        }
+        .category-buttons {
+            display: flex;
+            overflow-x: auto;
+            padding: 10px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .category-buttons button {
+            margin: 5px;
+            padding: 8px 12px;
+            border: none;
+            background: #ddd;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .category-buttons button.active {
+            background: #dd2323;
+            color: white;
+        }
+        .news-container {
+            display: grid;
+            gap: 15px;
+            padding: 15px;
+        }
+        .news-card {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .news-card img {
+            width: 100%;
+            border-radius: 5px;
+        }
+        .news-card h2 {
+            font-size: 18px;
+        }
+        .news-card p {
+            font-size: 14px;
+            color: #555;
+        }
+        .news-card a {
+            color: #dd2323;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>News App</header>
+
+    <div class="category-buttons">
+        <button onclick="fetchNews('general')" class="active">General</button>
+        <button onclick="fetchNews('business')">Business</button>
+        <button onclick="fetchNews('technology')">Technology</button>
+        <button onclick="fetchNews('sports')">Sports</button>
+        <button onclick="fetchNews('health')">Health</button>
+        <button onclick="fetchNews('entertainment')">Entertainment</button>
+    </div>
+
+    <div class="news-container" id="news-container"></div>
+
+    <script>
+        const API_KEY = "c22d075125b64bf496ef7ce53cb24787";
+        const newsContainer = document.getElementById("news-container");
+        const buttons = document.querySelectorAll(".category-buttons button");
+
+        async function fetchNews(category = "general") {
+            buttons.forEach(btn => btn.classList.remove("active"));
+            document.querySelector(`button[onclick="fetchNews('${category}')"]`).classList.add("active");
+
+            try {
+                const response = await fetch(`https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=${API_KEY}`);
+                const data = await response.json();
+                newsContainer.innerHTML = "";
+                
+                data.articles.forEach(article => {
+                    const newsCard = `
+                        <div class="news-card">
+                            <img src="${article.urlToImage || 'https://via.placeholder.com/150'}" alt="News Image">
+                            <h2>${article.title}</h2>
+                            <p>${article.description || "No description available"}</p>
+                            <a href="${article.url}" target="_blank">Read More</a>
+                        </div>
+                    `;
+                    newsContainer.innerHTML += newsCard;
+                });
+            } catch (error) {
+                console.error("Error fetching news:", error);
+            }
+        }
+
+        fetchNews();
+    </script>
+
+</body>
+</html>
